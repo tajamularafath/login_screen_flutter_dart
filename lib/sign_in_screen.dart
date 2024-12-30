@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:task_login_page/login_in_screen.dart';
 
 import 'Constants/string_constants.dart';
 
-class LoginPage extends StatelessWidget {
+class SignUpPage extends StatelessWidget {
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  final ValueNotifier<bool> _isPasswordObscure = ValueNotifier<bool>(true);
+  final ValueNotifier<bool> _isConfirmPasswordObscure = ValueNotifier<bool>(true);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,28 +49,64 @@ class LoginPage extends StatelessWidget {
                   },
                 ),
                 const SizedBox(height: 30),
-                TextFormField(
-                  decoration: const InputDecoration(
-                      border: UnderlineInputBorder(),
-                      hintText: "Password",
-                      hintStyle: TextStyle(color: Colors.grey)),
-                  validator: (value) {
-                    if(value == null || value.isEmpty || !RegExp(r"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$").hasMatch(value)){
-                      return "Please Enter Valid Password";
-                    }
+                ValueListenableBuilder(
+                  valueListenable: _isPasswordObscure,
+                  builder:
+                      (BuildContext context, bool isObscure, Widget? child) {
+                    return TextFormField(
+                      controller: _passwordController,
+                      decoration: InputDecoration(
+                          border: const UnderlineInputBorder(),
+                          hintText: "Password",
+                          hintStyle: const TextStyle(color: Colors.grey),
+                          suffixIcon: IconButton(
+                              icon: Icon(
+                                isObscure ? Icons.visibility : Icons.visibility_off,),
+                              onPressed: (){
+                                _isPasswordObscure.value = !isObscure;
+                              },),
+                      ),
+                      obscureText: isObscure,
+                      validator: (value) {
+                        if (value == null ||
+                            value.isEmpty ||
+                            !RegExp(r"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$")
+                                .hasMatch(value)) {
+                          return "Please Enter Valid Password";
+                        }
+                      },
+                    );
                   },
                 ),
                 const SizedBox(height: 30),
-                TextFormField(
-                  decoration: const InputDecoration(
-                      border: UnderlineInputBorder(),
-                      hintText: "Confirm Password",
-                      hintStyle: TextStyle(color: Colors.grey)),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return "Please Enter Valid Password";
-                  }
-                }
+                ValueListenableBuilder(
+                  valueListenable: _isConfirmPasswordObscure,
+                  builder: (BuildContext context, bool isObscure, Widget? child) {
+                    return  TextFormField(
+                        controller: _confirmPasswordController,
+                        decoration: InputDecoration(
+                            border: const UnderlineInputBorder(),
+                            hintText: "Confirm Password",
+                            hintStyle: const TextStyle(color: Colors.grey),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                isObscure ? Icons.visibility : Icons.visibility_off,
+                              ),
+                              onPressed: () {
+                                _isConfirmPasswordObscure.value = !isObscure;
+                            },),
+                        ),
+                        obscureText: isObscure,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please confirm your password';
+                          } else if(value != _passwordController.text){
+                            return "Password does not match";
+                          }
+                        }
+                    );
+                  },
+
                 ),
                 const SizedBox(height: 30),
                 Row(
@@ -131,6 +172,22 @@ class LoginPage extends StatelessWidget {
                   children: [
                     ElevatedButton(onPressed: () {}, child: Text("Google", style: TextStyle(color: Colors.red),)),
                     ElevatedButton(onPressed: () {}, child: Text("FaceBook", style: TextStyle(color: Colors.blueAccent)))
+                  ],
+                ),const SizedBox(height: 20,),
+                Column(
+                  children: [
+                    const Text("OR"),
+                    const SizedBox(height: 10,),
+                    const Text("Already Have Account Login Here",style: TextStyle(
+                      fontSize: 16.0,
+                    ),),
+                    const SizedBox(height: 20,),
+                    ElevatedButton(onPressed: (){
+                      Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => const LoginInScreen())
+                      );
+                    },
+                        child: Text("Login"))
                   ],
                 )
               ],
